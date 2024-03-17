@@ -1,0 +1,77 @@
+.container-form {
+  background-color: #00843C;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+div h2 {
+  text-decoration: underline;
+}
+
+.end-chbx {
+  margin: auto;
+  text-align: end;
+  margin-top: 1.5rem;
+  margin-button: 2rem;
+}
+
+.example-container {
+  height: 230px;
+  overflow: auto;
+}
+
+button {
+  width: 200px;
+}
+
+.container-btn {
+  display: flex;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media screen and (max-width: 568px) {
+  .justifymovil {
+    display: flex;
+  }
+
+  .position-btn {
+    text-align: center !important;
+  }
+}
+
+mat-card {
+  padding-bottom: 3rem;
+  //height: 905px!important;
+}
+
+.content-form {
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+.position-btn {
+  display: flex;
+  flex-direction: row-reverse !important;
+}
+
+.container-title {
+  margin-top: 1.6rem !important;
+  margin-bottom: 2rem !important;
+}
+
+
+.container {
+  margin-left: 1rem;
+  padding-right: 2rem;
+}
+
+button{
+  width: 150px!important;
+}
+
+table {
+  width: 100%;
+}

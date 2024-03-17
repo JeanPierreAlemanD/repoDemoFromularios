@@ -1,0 +1,69 @@
+@import "variables";
+@import "bootstrap/scss/bootstrap";
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
+
+.separator {
+  border-top: 1px solid #ccc;;
+  margin: 5px 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+p {
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('assets/fuentes/montserrat/Montserrat-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('assets/fuentes/montserrat/Montserrat-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+.bk-white {
+  background-color: #ffffff;
+}
+
+
+
+.txt-red {
+  color: red;
+}
+
+table {
+  width: 100%;
+}
+
+.g-modal {
+  border-radius: 15px;
+}
+
+
+:root {
+  --default-font-family: "Poppins", sans-serif;
+  --body-bg-color: #f5f5f5;
+  --default-text-color: #333;
+  --base-separation: 1rem;
+  --half-separation: calc(var(--base-separation) / 2);
+}
+

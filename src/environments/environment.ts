@@ -1,16 +1,22 @@
-// This file can be replaced during build by using the `fileReplacements` array.
-// `ng build` replaces `environment.ts` with `environment.prod.ts`.
-// The list of file replacements can be found in `angular.json`.
+const protocol = 'http'
+const host = '192.168.33.21'
+const port = '8181'
+const port_dos = '9090';
+const api_public = `${protocol}://${host}:${port}`
+const api_public_90 = `${protocol}://${host}:${port_dos}`
+
 
 export const environment = {
-  production: false
+  production: false,
+  env:'dev',
+  api: {
+    route: {
+      consultarDni: `${api_public}/reniec/personaByDni`,
+      consutlaEstado: `${api_public_90}/entidaddetalle`,
+      registrarInscripcion: `${api_public}/inscripcion`
+    }
+  },
+  key: {
+    recaptcha: '6LcKzJcpAAAAAEgcEJ3zYFHIiq7LHprghEp6Mf1f'
+  }
 };
-
-/*
- * For easier debugging in development mode, you can import the following file
- * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
- *
- * This import should be commented out in production mode because it will have a negative impact
- * on performance if an error is thrown.
- */
-// import 'zone.js/plugins/zone-error';  // Included with Angular CLI.

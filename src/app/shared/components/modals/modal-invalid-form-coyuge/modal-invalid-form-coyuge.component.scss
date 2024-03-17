@@ -1,0 +1,57 @@
+.modal-succes
+.mat-dialog-container {
+  background-color: #FFFFFF;
+  border-radius: 30px !important;
+  text-align: center;
+  padding: 10px;
+
+}
+
+.g-container-header {
+  padding: 15px 10px;
+  position: relative;
+  font-family: Montserrat;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  //background-color: #216057;
+  text-align: center;
+
+
+  .h3 {
+    color: white;
+    //padding-top: 5px!important;
+    text-align: center;
+
+  }
+}
+
+.g-modal-body-error {
+  padding-top: 5px;
+  padding-left: 0;
+  text-transform: uppercase;
+  font-weight: 400;
+  text-align: center;
+  padding-right: 0;
+
+  .p {
+    font-family: Montserrat;
+    text-align: center;
+  }
+}
+
+div{
+  h2{
+    color: rgba(229, 160, 31, 0.91);
+
+  }
+}
+
+.g-modal-footer {
+  //display: flex;
+  text-align: center;
+}
+
+
+.button-info{
+  background-color: rgb(226 153 16 / 91%);
+}

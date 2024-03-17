@@ -1,0 +1,19 @@
+<div class="g-modal">
+  <div class="g-container-header">
+    <img src="./assets/imagenes/success.png" width="80" height="80">
+    <h2>{{ data.title }}</h2>
+  </div>
+  <div class="g-modal-body">
+    <p><strong> Felicitaciones: {{ data.nombres }}</strong></p>
+    <p>
+      ¡La inscripción se registron correctamente!
+    </p>
+  </div>
+  <div class="g-modal-footer">
+    <button mat-raised-button color="primary"  style="width: 140px" class="demo-button" (click)="close()">
+      Aceptar
+    </button>
+  </div>
+
+
+</div>
