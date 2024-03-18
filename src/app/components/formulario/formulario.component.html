@@ -29,8 +29,7 @@
                   <div class="col-md-4">
                     <mat-form-field appearance="outline">
                       <mat-label>Número de DNI</mat-label>
-                      <input formControlName="dni" (keypress)="validatorLengh('dni')" hbkOnlyNumber matInput
-                             placeholder="Placeholder">
+                      <input formControlName="dni" (keypress)="validatorLengh('dni')" hbkOnlyNumber matInput>
                       <mat-icon mat-mini-fab style="cursor: pointer" matSuffix (click)="obtenerDatos()">search
                       </mat-icon>
                       <mat-error *ngIf="isValidField('dni')">{{ getFieldErrors('dni') }}</mat-error>
@@ -59,8 +58,7 @@
                       <mat-label>Número de CIP</mat-label>
                       <input formControlName="cip" [(ngModel)]="inputValueCip" (keypress)="validatorLengh('cip')"
                              (blur)="agregarCeros()" matInput
-                             hbkOnlyNumber
-                             placeholder="Placeholder">
+                             hbkOnlyNumber>
                       <mat-error *ngIf="isValidField('cip')">{{ getFieldErrors('cip') }}</mat-error>
                     </mat-form-field>
                   </div>
@@ -102,7 +100,7 @@
                   <div class="col-md-8">
                     <mat-form-field appearance="outline">
                       <mat-label>Correo</mat-label>
-                      <input formControlName="email" matInput placeholder="Placeholder">
+                      <input formControlName="email" matInput>
                       <mat-error *ngIf="isValidField('email')">{{ getFieldErrors('email') }}</mat-error>
                     </mat-form-field>
                   </div>
@@ -118,8 +116,7 @@
                   <div [ngClass]="{'col-md-12': !estadoConviviente, 'col-md-8': estadoConviviente}">
                     <mat-form-field appearance="outline">
                       <mat-label>Dirección</mat-label>
-                      <input formControlName="direccion1" #adrress (keypress)="validatorLengh('direccion1')" matInput
-                             placeholder="Placeholder">
+                      <input formControlName="direccion1" #adrress (keypress)="validatorLengh('direccion1')" matInput>
                       <mat-hint align="end">{{ adrress.value.length }} / 100</mat-hint>
                     </mat-form-field>
                   </div>
@@ -218,20 +215,27 @@
                        Faltan los datos del Conyuge!
                       </span>
               </div>
-
+              <div class="row" *ngIf="estadoConviviente">
+                <comp-conviviente
+                  [factorConviviente]="factor"
+                  (formDatosConviviente)="recibirdatos($event)"></comp-conviviente>
+                <span style="font-size: 18px;color: red; margin: 0.5rem"
+                      *ngIf="mostarMensajeConyuge">
+                                       Faltan los datos del Conyuge!
+                                      </span>
+              </div>
             </div>
             <br>
             <div class="col-md-12">
               <div class="row">
-                <!--                <div class="col-md-4">-->
-                <!--                  <re-captcha (resolved)="recaptchaResolved($event)"></re-captcha>-->
-                <!--                </div>-->
-                <div class="col-sm-12 col-md-6 end-chbx">
+                <div class="col-sm-12 col-md-4">
+                  <re-captcha (resolved)="recaptchaResolved($event)"></re-captcha>
+                </div>
+                <div class="col-sm-12 col-md-5 end-chbx">
                   <mat-checkbox [(ngModel)]="terminos">
                     Acepto todas las declaraciones en los <a class="link_tc">Términos de servicios</a>
                   </mat-checkbox>
                   <br>
-                  <!--                  <span *ngIf="terminosMarcar" class="form-text text-danger">Este campo es requerido </span>-->
                 </div>
               </div>
               <div class="container-btn row">

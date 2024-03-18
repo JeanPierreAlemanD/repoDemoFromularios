@@ -1,15 +1,16 @@
 const protocol = 'http'
 const host = 'faisanes.fovipol.gob.pe'
+const subdomin = 'foviadmin-informacion'
 const port = '8080'
 
+
 // constante public
-const api_public = `${protocol}://${host}:${port}`
+const api_public = `${protocol}://${host}:${port}/${subdomin}`
 
 // http://faisanes.fovipol.gob.pe:8080
-
 export const environment = {
   production: true,
-  env:'production',
+  env: 'production',
   api: {
     route: {
       consultarDni: `${api_public}/reniec/personaByDni`,
@@ -18,6 +19,6 @@ export const environment = {
     }
   },
   key: {
-    recaptcha: '6LcKzJcpAAAAAEgcEJ3zYFHIiq7LHprghEp6Mf1f'
+    recaptcha: '6Lf1mJspAAAAAIY5inTKf804tZ_L01LG15nOLe-M'
   }
 };

@@ -25,13 +25,13 @@ export interface TableItem {
   templateUrl: './formulario.component.html',
   styleUrls: ['./formulario.component.scss'],
 })
-export class FormularioComponent implements OnInit, OnChanges {
+export class FormularioComponent implements OnInit {
+
   errorMessage: string = '';
   inputValueCip: string = ''
   nombres: string = ''
   primerApellido: string = ''
   segundoApellido: string = ''
-  inputValue: number = 0
   selectedOption: string = ''
   estadoSelected: string = ''
   estadoCasado: boolean = false
@@ -41,20 +41,28 @@ export class FormularioComponent implements OnInit, OnChanges {
   mostrarMensaje: boolean = false
   datosNecesarios: boolean = false
   loading: boolean = false
+  formConyugeIsValid: boolean = true
+  mostarMensajeConyuge: boolean = false
   data: TableItem[] = [];
   displayedColumns: string[] = ['option', 'value', 'action'];
   @ViewChild(MatTable) table!: MatTable<TableItem>;
   estadoCivil: respSelectedFrom[] = []
   factor: respSelectedFrom[] = []
-  estadoCivilAdministrado: number = 0
   conyugeData: any
-  formConyugeIsValid: boolean = true
-  mostarMensajeConyuge: boolean = false
+  convivienteData: any
+
   dialogRef: any
   terminos: boolean = false
   terminosMarcar: boolean = false
-  estadoRegister: number = 0
   dataTotal: any
+  valueCaptcha: any
+  CASADO = 2
+  CONVIVIENTE = 5
+  estadoRegister: number = 0
+  estadoCivilAdministrado: number = 0
+  inputValue: number = 0
+
+
   public form: FormGroup = this.fb.group({
     dni: ['', [Validators.required, Validators.minLength(8), dniRepetidoValidator()]],
     cip: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(8)]],
@@ -87,12 +95,6 @@ export class FormularioComponent implements OnInit, OnChanges {
 
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes) {
-      console.log('changes -admin', changes)
-    }
-  }
-
   ingresoFormGroup() {
     return this.fb.group({
       factorIngreso: 0,
@@ -101,7 +103,6 @@ export class FormularioComponent implements OnInit, OnChanges {
   }
 
   recibirFormconyugeValid(isValid: boolean) {
-    console.log('changes conyuge-isValid:', isValid)
     this.formConyugeIsValid = isValid
     if (this.formConyugeIsValid) {
       this.mostarMensajeConyuge = false
@@ -109,8 +110,13 @@ export class FormularioComponent implements OnInit, OnChanges {
   }
 
   recibirdatos(datos: any) {
-    this.conyugeData = datos
-    console.log('Formulario conyuge', datos)
+
+    if (this.estadoRegister == 2) {
+      this.conyugeData = datos
+    }
+    if (this.estadoRegister == 5) {
+      this.convivienteData = datos
+    }
   }
 
   ngOnInit(): void {
@@ -134,6 +140,7 @@ export class FormularioComponent implements OnInit, OnChanges {
           break;
         case '5': //conviviente
           this.estadoConviviente = true;
+          this.estadoCasado = false;
           this.form.get('numeroPartida')?.setValidators([Validators.required]);
           this.ref.detectChanges()
           break;
@@ -168,7 +175,7 @@ export class FormularioComponent implements OnInit, OnChanges {
 
   addItemTable() {
     if (this.selectedOption && this.inputValue) {
-      const existeTipoValor = this.data.some(item => item.factorIngreso === this.selectedOption);
+      const existeTipoValor = this.data.some(item => item.factorIngresoId === this.selectedOption);
       const selectedId = this.factor.find(item => item.valoCaduDet === this.selectedOption);
       if (!existeTipoValor) {
         this.data.push({
@@ -249,9 +256,9 @@ export class FormularioComponent implements OnInit, OnChanges {
     }
   }
 
-  // recaptchaResolved(captchaResponse: string) {
-  //   console.log(`Resolved captcha with response: ${captchaResponse}`);
-  // }
+  recaptchaResolved(captchaResponse: string) {
+    this.valueCaptcha = captchaResponse
+  }
 
   isValidField(field: string): boolean | null {
     return (
@@ -277,8 +284,6 @@ export class FormularioComponent implements OnInit, OnChanges {
   }
 
   registrar() {
-    console.log('estadoRegister', this.estadoRegister)
-    console.log('conyugeData', this.conyugeData)
     this.cargarCatos()
     console.log('dataTotal--> ', this.dataTotal)
     this.loading = true
@@ -294,11 +299,13 @@ export class FormularioComponent implements OnInit, OnChanges {
       this.form.markAllAsTouched();
       return;
     }
+
     this.reniecService.registrarInscripcion(this.dataTotal).subscribe(
       data => {
         const valido = data.code
+        const mensaje = data.message
         if (valido === 400) {
-          this.modalInfo()
+          this.modalInfo(mensaje)
           this.loading = false
           return;
         }
@@ -317,8 +324,7 @@ export class FormularioComponent implements OnInit, OnChanges {
   }
 
   cargarCatos() {
-    console.log('estadoRegister', this.estadoRegister)
-    if (this.estadoRegister == 2) {
+    if (this.estadoRegister == this.CASADO) {
       this.dataTotal = {
         cip: this.form.get('cip')?.value,
         direccion1: this.form.get('direccion1')?.value,
@@ -336,11 +342,37 @@ export class FormularioComponent implements OnInit, OnChanges {
         cipConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.cipconyuge : null,
         dniConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.dniconyuge : null,
         ingresosConyuge: this.estadoRegister == 2 ? this.conyugeData.dataConyuge : null,
-        nombresConyuge: this.estadoRegister = 2 ? this.conyugeData.formConyuge.nombreconyuge : null,
-        primerApellidoConyuge: this.estadoRegister = 2 ? this.conyugeData.formConyuge.primerApellidoConyuge : null,
-        segundoApellidoConyuge: this.estadoRegister = 2 ? this.conyugeData.formConyuge.segundoApellidoConyuge : null,
+        nombresConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.nombreconyuge : null,
+        primerApellidoConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.primerApellidoConyuge : null,
+        segundoApellidoConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.segundoApellidoConyuge : null,
+        captcha: this.estadoRegister == 2 ? this.valueCaptcha : null
       }
-    } else {
+    }
+    if (this.estadoRegister == this.CONVIVIENTE) {
+      this.dataTotal = {
+        cip: this.form.get('cip')?.value,
+        direccion1: this.form.get('direccion1')?.value,
+        dni: this.form.get('dni')?.value,
+        email: this.form.get('email')?.value,
+        estadoCivil: this.form.get('estadoCivil')?.value,
+        ingresos: this.data,
+        ip: null,
+        nombres: this.form.get('nombres')?.value,
+        numeroPartida: this.form.get('numeroPartida')?.value ? this.form.get('numeroPartida')?.value : null,
+        primerApellido: this.form.get('primerApellido')?.value,
+        segundoApellido: this.form.get('segundoApellido')?.value,
+        telefono1: this.form.get('telefono1')?.value,
+        // form conviviente ---
+        cipConyuge: this.convivienteData.formConviviente.cipConviviente ? this.convivienteData.formConviviente.cipConviviente : null,
+        dniConyuge: this.convivienteData.formConviviente.dniConviviente ? this.convivienteData.formConviviente.dniConviviente : null,
+        ingresosConyuge: this.convivienteData.dataConviviente ? this.convivienteData.dataConviviente : null,
+        nombresConyuge: this.convivienteData.formConviviente.nombreConviviente ? this.convivienteData.formConviviente.nombreConviviente : null,
+        primerApellidoConyuge: this.convivienteData.formConviviente.primerApellidoConviviente ? this.convivienteData.formConviviente.primerApellidoConviviente : null,
+        segundoApellidoConyuge: this.convivienteData.formConviviente.segundoApellidoConviviente ? this.convivienteData.formConviviente.segundoApellidoConviviente : null,
+        captcha: this.valueCaptcha ? this.valueCaptcha : null
+      }
+    }
+    if (this.estadoRegister == 1 || this.estadoRegister == 3 || this.estadoRegister == 4) {
       this.dataTotal = {
         cip: this.form.get('cip')?.value,
         direccion1: this.form.get('direccion1')?.value,
@@ -361,17 +393,19 @@ export class FormularioComponent implements OnInit, OnChanges {
         nombresConyuge: null,
         primerApellidoConyuge: null,
         segundoApellidoConyuge: null,
+        captcha: this.valueCaptcha ? this.valueCaptcha : null
       }
     }
   }
 
 
-  modalInfo() {
+  modalInfo(mensaje: string) {
     this.dialogRef = this.dialog.open(ModalInvalidFormCoyugeComponent, {
       width: '450px',
       panelClass: 'modal-Info',
       data: {
         title: 'Info',
+        data: mensaje
       }
     })
   }
@@ -390,7 +424,6 @@ export class FormularioComponent implements OnInit, OnChanges {
       this.cleanFormulario();
       this.form.get('dni')!.setValue('');
       window.location.reload();
-      console.log(`Se reseteara`);
     });
   }
 

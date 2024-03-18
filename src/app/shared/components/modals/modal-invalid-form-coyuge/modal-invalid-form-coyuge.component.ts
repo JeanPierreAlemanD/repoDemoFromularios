@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {MatDialog} from "@angular/material/dialog";
+import {Component, Inject, OnInit} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialog} from "@angular/material/dialog";
+import {ApiResponse} from "../../../../services/api.models";
 
 @Component({
   selector: 'comp-invalid-form-coyuge',
@@ -8,7 +9,9 @@ import {MatDialog} from "@angular/material/dialog";
 })
 export class ModalInvalidFormCoyugeComponent implements OnInit {
 
-  constructor(public dialog: MatDialog) { }
+  constructor(
+    public dialog: MatDialog,
+    @Inject(MAT_DIALOG_DATA) public data:ApiResponse<any>) { }
 
   ngOnInit(): void {
   }

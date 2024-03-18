@@ -32,14 +32,13 @@ export class ReniecService {
   }
 
   getFactor(): Observable<respSelectedFrom[]> {
-    return this.http.get<ApiResponse<respSelectedFrom[]>>(`${environment.api.route.consutlaEstado}?codiEntiEnt=TIPODOCUPAG`)
+    return this.http.get<ApiResponse<respSelectedFrom[]>>(`${environment.api.route.consutlaEstado}?codiEntiEnt=CODITIPODOC`)
       .pipe(
         map(m => m.body)
       )
   }
 
   registrarInscripcion(params: any): Observable<any> {
-    return this.apiService.post<requestRegistrar>(`${environment.api.route.registrarInscripcion}`, params).pipe();
+    return this.apiService.post<ApiResponse<requestRegistrar>>(`${environment.api.route.registrarInscripcion}`, params).pipe();
   }
-
 }

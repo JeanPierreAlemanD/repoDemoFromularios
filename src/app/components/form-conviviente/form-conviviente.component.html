@@ -1,0 +1,110 @@
+<div class="row">
+  <h2>Datos Conviviente</h2>
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-12">
+        <form [formGroup]="formConviviente">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="col-md-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Número de DNI</mat-label>
+                  <input formControlName="dniConviviente" (keypress)="validatorLengh('dniConviviente')" hbkOnlyNumber matInput>
+                  <mat-error *ngIf="isValidField('dniConviviente')">{{ getFieldErrors('dniConviviente') }}</mat-error>
+                  <mat-error *ngIf="formConviviente.get('dniConviviente')?.hasError('dniRepetido')">
+                    El DNI no puede contener cuatro dígitos repetidos consecutivos
+                  </mat-error>
+                  <mat-icon mat-mini-fab style="cursor: pointer" matSuffix (click)="obtenerDatos()">search
+                  </mat-icon>
+                  <br>
+                </mat-form-field>
+              </div>
+              <div class="col-md-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Número de CIP</mat-label>
+                  <input formControlName="cipConviviente" (blur)="agregarCeros()" [(ngModel)]="inputValueCipConviviente"
+                         (keypress)="validatorLengh('cipConviviente')" matInput hbkOnlyNumber>
+                  <mat-error *ngIf="isValidField('cipConviviente')">{{ getFieldErrors('cipConviviente') }}</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Factor</mat-label>
+                  <mat-select [(ngModel)]="selectedOption" [ngModelOptions]="{standalone: true}">
+                    <mat-option
+                      *ngFor="let fac of factor" [value]="fac.valoCaduDet">
+                      {{ fac.valoCaduDet }}
+                    </mat-option>
+                  </mat-select>
+                  <span
+                    *ngIf="mostrarMensaje" class="form-text text-danger">
+                            No se puede repetir el Factor </span>
+                </mat-form-field>
+              </div>
+              <div class="col-md-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Monto:</mat-label>
+                  <input type="text" [(ngModel)]="inputValue"
+                         mask="separator.0"
+                         thousandSeparator="."
+                         [ngModelOptions]="{standalone: true}"
+                         prefix="S/." matInput
+                         placeholder="0.00">
+                </mat-form-field>
+                <span
+                  *ngIf="datosNecesarios" class="form-text text-danger">
+                       El Factor y Monto es requerido
+                      </span>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="col-md-12">
+                <mat-form-field appearance="outline">
+                  <mat-label>Nombre Completo</mat-label>
+                  <input formControlName="nombreConviviente" hbkOnlyLetters matInput *ngIf="ocultar">
+                  <input [(ngModel)]="nombreConviviente" disabled matInput [ngModelOptions]="{standalone: true}"
+                         *ngIf="!ocultar">
+                  <mat-error *ngIf="isValidField('nombreConviviente')">{{ getFieldErrors('nombreConviviente') }}</mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-12">
+                <div class="example-container">
+                  <table mat-table [dataSource]="dataConviviente">
+                    <ng-container matColumnDef="option">
+                      <th mat-header-cell *matHeaderCellDef>Factor Ingresado</th>
+                      <td mat-cell *matCellDef="let element">{{ element.factorIngresoId }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="value">
+                      <th mat-header-cell *matHeaderCellDef>Monto</th>
+                      <td mat-cell *matCellDef="let element">S/. {{ element.monto }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="action">
+                      <th mat-header-cell *matHeaderCellDef style="width: 80px">Acciones</th>
+                      <td mat-cell *matCellDef="let row">
+                        <button mat-icon-button color="warn" style="width: 80px" (click)="deleteItem(row)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="col-md-12">
+          <div class="col-md-4 position-btn-cy">
+            <button mat-raised-button color="primary" style="width: 140px;" (click)="addItemTable()"
+                    class="demo-button">
+              <mat-icon>add</mat-icon>
+              Agregar
+            </button>
+          </div>
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+</div>

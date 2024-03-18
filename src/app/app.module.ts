@@ -17,6 +17,7 @@ import {OnlyLettersDirective} from "./shared/helper/only-letters.directive";
 import {ModalsModule} from "./shared/components/modals/modals.module";
 import {OnlyAlphaNumberDirective} from "./shared/helper/only-alphanumeric.directive";
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
+import { FormConvivienteComponent } from './components/form-conviviente/form-conviviente.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { SpinnerComponent } from './shared/components/spinner/spinner.component'
     FooterComponent,
     FormularioComponent,
     FormConyugeComponent,
-    SpinnerComponent
+    SpinnerComponent,
+    FormConvivienteComponent
   ],
   imports: [
     BrowserModule,

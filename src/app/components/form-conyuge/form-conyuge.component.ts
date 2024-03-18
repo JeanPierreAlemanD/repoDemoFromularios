@@ -90,7 +90,6 @@ export class FormConyugeComponent implements OnInit, OnChanges {
     if (changes) {
       this.factor = this.factorConyugue
     }
-
   }
 
   ngOnInit(): void {
@@ -133,7 +132,7 @@ export class FormConyugeComponent implements OnInit, OnChanges {
 
   addItemTable() {
     if (this.selectedOption && this.inputValue) {
-      const existeTipoValor = this.dataConyuge.some(item => item.factorIngreso === this.selectedOption);
+      const existeTipoValor = this.dataConyuge.some(item => item.factorIngresoId === this.selectedOption);
       const selectedId = this.factor.find(item => item.valoCaduDet === this.selectedOption);
       if (!existeTipoValor) {
         this.dataConyuge.push({factorIngreso:selectedId!.secuEntiDet.toString() , monto: this.inputValue,factorIngresoId:this.selectedOption});
@@ -159,6 +158,7 @@ export class FormConyugeComponent implements OnInit, OnChanges {
   deleteItem(row: TableItem) {
     const index = this.dataConyuge.indexOf(row);
     if (index > -1) {
+      this.emitirValores()
       this.dataConyuge.splice(index, 1);
     }
     this.table.renderRows();
