@@ -1,7 +1,7 @@
-const protocol = 'http'
-const host = 'faisanes.fovipol.gob.pe'
+const protocol = 'https'
+const host = 'app.fovipol.gob.pe'
 const subdomin = 'foviadmin-informacion'
-const port = '8080'
+const port = '8181'
 
 
 // constante public

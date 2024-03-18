@@ -285,7 +285,7 @@ export class FormularioComponent implements OnInit {
 
   registrar() {
     this.cargarCatos()
-    console.log('dataTotal--> ', this.dataTotal)
+    // console.log('dataTotal--> ', this.dataTotal)
     this.loading = true
     if (this.estadoRegister === 2 && !(this.formConyugeIsValid)) {
       this.mostarMensajeConyuge = true
