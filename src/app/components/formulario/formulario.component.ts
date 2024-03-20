@@ -1,16 +1,8 @@
-import {
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReniecService } from '../../services/reniec.service';
-import {  anyToBoolean,
+import {
+  anyToBoolean,
   dniRepetidoValidator,
   getfieldMessage,
 } from '../../shared/helper/helper';
@@ -69,9 +61,9 @@ export class FormularioComponent implements OnInit {
   estadoCivilAdministrado: number = 0;
   inputValue: number = 0;
   valueCaptcha: string = '';
-  captchaResponse:string=''
+  captchaResponse: string = '';
   @ViewChild('capthcForm') capthcForm!: RecaptchaComponent;
-  mostarMensajeCaptcha:boolean=false
+  mostarMensajeCaptcha: boolean = false;
   public form: FormGroup = this.fb.group({
     dni: [
       '',
@@ -106,9 +98,7 @@ export class FormularioComponent implements OnInit {
     private reniecService: ReniecService,
     private dialog: MatDialog,
     private ref: ChangeDetectorRef
-  ) {
-
-  }
+  ) {}
 
   ingresoFormGroup() {
     return this.fb.group({
@@ -181,8 +171,8 @@ export class FormularioComponent implements OnInit {
       (e) => {
         if (!e) return;
         this.estadoCivil = e;
-        const estadoInit = e.map(m=> m.secuEntiDet)
-        this.estadoSelected=estadoInit[0].toString()
+        const estadoInit = e.map((m) => m.secuEntiDet);
+        this.estadoSelected = estadoInit[0].toString();
       },
       (error) => {
         this.errorMessage = error;
@@ -297,7 +287,7 @@ export class FormularioComponent implements OnInit {
   recaptchaResolved(captchaResponse: string) {
     if (captchaResponse) {
       this.valueCaptcha = captchaResponse;
-      this.mostarMensajeCaptcha = false
+      this.mostarMensajeCaptcha = false;
     } else {
       this.capthcForm.reset();
     }
@@ -326,20 +316,28 @@ export class FormularioComponent implements OnInit {
   }
 
   handleCheckbox(data: any) {
-    this.terminos = data;
-    this.terminosMarcar = !this.terminos;
+    if (data == true) {
+      this.terminos = data;
+      this.terminosMarcar = false;
+    } else {
+      this.terminosMarcar = true;
+    }
   }
 
-  resert(){
-    this.capthcForm.reset()
+  resert() {
+    this.capthcForm.reset();
   }
 
   registrar() {
     // debugger;
-    const captchaIdValid = anyToBoolean(this.captchaResponse)
-    captchaIdValid== true ? this.mostarMensajeCaptcha = false :this.mostarMensajeCaptcha = true
-    if (this.form.invalid || !this.terminos) {
-      this.terminosMarcar = true;
+    const captchaIdValid = anyToBoolean(this.captchaResponse);
+    captchaIdValid == true
+      ? (this.mostarMensajeCaptcha = false)
+      : (this.mostarMensajeCaptcha = true);
+    this.terminos == true
+      ? (this.terminosMarcar = false)
+      : (this.terminosMarcar = true);
+    if (this.form.invalid) {
       this.loading = false;
       this.form.markAllAsTouched();
       return;
@@ -357,23 +355,23 @@ export class FormularioComponent implements OnInit {
     this.cargarCatos();
     // this.loading = false;
     // console.log('dataTotal--> ', this.dataTotal);
-    this.reniecService.registrarInscripcion(this.dataTotal).subscribe(
-      data => {
+    this.reniecService
+      .registrarInscripcion(this.dataTotal)
+      .subscribe((data) => {
         if (data.body) {
-          const nameSucces = this.form.get('nombres')?.value
-          this.loading = false
-          this.modalSuccessInscription(nameSucces)
+          const nameSucces = this.form.get('nombres')?.value;
+          this.loading = false;
+          this.modalSuccessInscription(nameSucces);
         }
-        const inValido = data.code
-        const mensaje = data.message
+        const inValido = data.code;
+        const mensaje = data.message;
         if (inValido === 400) {
-          this.modalInfo(mensaje)
-          this.loading = false
-          this.capthcForm.reset()
+          this.modalInfo(mensaje);
+          this.loading = false;
+          this.capthcForm.reset();
           return;
         }
-      }
-    )
+      });
   }
 
   cargarCatos() {
