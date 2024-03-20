@@ -56,4 +56,16 @@ export function completarConCerosValidator(): ValidatorFn {
 
 
 
+export function anyToBoolean(value:any) {
+  if(value == null || value ==''){
+    return false
+  }else{
+    return true
+  }
+
+
+}
+
+
+
 

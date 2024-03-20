@@ -1,18 +1,26 @@
-import {ChangeDetectorRef, Component, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {ReniecService} from "../../services/reniec.service";
-import {dniRepetidoValidator, getfieldMessage} from "../../shared/helper/helper";
-import {MatTable} from "@angular/material/table";
-import {respSelectedFrom} from "../../models/estadocivil.models";
-import {MatDialog} from "@angular/material/dialog";
 import {
-  ModalSuccesInscriptionComponent
-} from "../../shared/components/modals/modal-succes-inscription/modal-succes-inscription.component";
-import {ModalsErrorComponent} from "../../shared/components/modals/modal-error/modals-error.component";
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import {
-  ModalInvalidFormCoyugeComponent
-} from "../../shared/components/modals/modal-invalid-form-coyuge/modal-invalid-form-coyuge.component";
-
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { ReniecService } from '../../services/reniec.service';
+import {  anyToBoolean,
+  dniRepetidoValidator,
+  getfieldMessage,
+} from '../../shared/helper/helper';
+import { MatTable } from '@angular/material/table';
+import { respSelectedFrom } from '../../models/estadocivil.models';
+import { MatDialog } from '@angular/material/dialog';
+import { ModalSuccesInscriptionComponent } from '../../shared/components/modals/modal-succes-inscription/modal-succes-inscription.component';
+import { ModalsErrorComponent } from '../../shared/components/modals/modal-error/modals-error.component';
+import { ModalInvalidFormCoyugeComponent } from '../../shared/components/modals/modal-invalid-form-coyuge/modal-invalid-form-coyuge.component';
+import { RecaptchaComponent } from 'ng-recaptcha';
 
 export interface TableItem {
   factorIngresoId: string;
@@ -26,47 +34,54 @@ export interface TableItem {
   styleUrls: ['./formulario.component.scss'],
 })
 export class FormularioComponent implements OnInit {
-
   errorMessage: string = '';
-  inputValueCip: string = ''
-  nombres: string = ''
-  primerApellido: string = ''
-  segundoApellido: string = ''
-  selectedOption: string = ''
-  estadoSelected: string = ''
-  estadoCasado: boolean = false
-  estadoConviviente: boolean = false
-  requirePartida: boolean = false
-  datos: boolean = true
-  mostrarMensaje: boolean = false
-  datosNecesarios: boolean = false
-  loading: boolean = false
-  formConyugeIsValid: boolean = true
-  mostarMensajeConyuge: boolean = false
+  inputValueCip: string = '';
+  nombres: string = '';
+  primerApellido: string = '';
+  segundoApellido: string = '';
+  selectedOption: string = '';
+  estadoSelected: string = '';
+  estadoCasado: boolean = false;
+  estadoConviviente: boolean = false;
+  requirePartida: boolean = false;
+  datos: boolean = true;
+  mostrarMensaje: boolean = false;
+  datosNecesarios: boolean = false;
+  loading: boolean = false;
+  formConyugeIsValid: boolean = false;
+  formConvivienteIsValid: boolean = false;
+  mostarMensajeConyuge: boolean = false;
+  mostarMensajeConviviente: boolean = false;
   data: TableItem[] = [];
   displayedColumns: string[] = ['option', 'value', 'action'];
   @ViewChild(MatTable) table!: MatTable<TableItem>;
-  estadoCivil: respSelectedFrom[] = []
-  factor: respSelectedFrom[] = []
-  conyugeData: any
-  convivienteData: any
-
-  dialogRef: any
-  terminos: boolean = false
-  terminosMarcar: boolean = false
-  dataTotal: any
-  valueCaptcha: any
-  CASADO = 2
-  CONVIVIENTE = 5
-  estadoRegister: number = 0
-  estadoCivilAdministrado: number = 0
-  inputValue: number = 0
-
-
+  estadoCivil: respSelectedFrom[] = [];
+  factor: respSelectedFrom[] = [];
+  conyugeData: any;
+  convivienteData: any;
+  dialogRef: any;
+  terminos: boolean = false;
+  terminosMarcar: boolean = false;
+  dataTotal: any;
+  CASADO = '2';
+  CONVIVIENTE = '5';
+  estadoRegister: string = '';
+  estadoCivilAdministrado: number = 0;
+  inputValue: number = 0;
+  valueCaptcha: string = '';
+  captchaResponse:string=''
+  @ViewChild('capthcForm') capthcForm!: RecaptchaComponent;
+  mostarMensajeCaptcha:boolean=false
   public form: FormGroup = this.fb.group({
-    dni: ['', [Validators.required, Validators.minLength(8), dniRepetidoValidator()]],
-    cip: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(8)]],
-    estadoCivil: [0, [Validators.required]],
+    dni: [
+      '',
+      [Validators.required, Validators.minLength(8), dniRepetidoValidator()],
+    ],
+    cip: [
+      '',
+      [Validators.required, Validators.minLength(6), Validators.maxLength(8)],
+    ],
+    estadoCivil: [1, [Validators.required]],
     nombres: ['', [Validators.required]],
     primerApellido: ['', [Validators.required]],
     segundoApellido: ['', [Validators.required]],
@@ -75,6 +90,7 @@ export class FormularioComponent implements OnInit {
     direccion1: ['', [Validators.maxLength(100)]],
     ip: [''],
     numeroPartida: [''],
+    catpcha: [''],
     // form coyuge
     dniConyuge: [],
     cipConyuge: [],
@@ -82,120 +98,137 @@ export class FormularioComponent implements OnInit {
     primerApellidoConyuge: [],
     segundoApellidoConyuge: [],
     montoadjuducatario: [],
-    ingresos: this.fb.array([
-      this.ingresoFormGroup()
-    ]),
-  })
+    ingresos: this.fb.array([this.ingresoFormGroup()]),
+  });
 
   constructor(
     private fb: FormBuilder,
     private reniecService: ReniecService,
     private dialog: MatDialog,
-    private ref: ChangeDetectorRef) {
+    private ref: ChangeDetectorRef
+  ) {
 
   }
 
   ingresoFormGroup() {
     return this.fb.group({
       factorIngreso: 0,
-      monto: 0
+      monto: 0,
     });
   }
 
   recibirFormconyugeValid(isValid: boolean) {
-    this.formConyugeIsValid = isValid
+    this.formConyugeIsValid = isValid;
     if (this.formConyugeIsValid) {
-      this.mostarMensajeConyuge = false
+      this.mostarMensajeConyuge = false;
+    }
+  }
+
+  recibirFormconvivienteValid(isValid: boolean) {
+    this.formConvivienteIsValid = isValid;
+    if (this.formConvivienteIsValid) {
+      this.mostarMensajeConyuge = false;
     }
   }
 
   recibirdatos(datos: any) {
-
-    if (this.estadoRegister == 2) {
-      this.conyugeData = datos
+    if (this.estadoRegister == '2') {
+      this.conyugeData = datos;
     }
-    if (this.estadoRegister == 5) {
-      this.convivienteData = datos
+    if (this.estadoRegister == '5') {
+      this.convivienteData = datos;
     }
   }
 
   ngOnInit(): void {
-    this.estadoCasado = false
-    this.form.controls['dni'].valueChanges.subscribe(d => {
+    this.terminos;
+    this.estadoCasado = false;
+    this.form.controls['dni'].valueChanges.subscribe((d) => {
       if (d.length < 1) {
-        this.datos = true
-        this.form.get('nombres')?.setValue('')
-        this.form.get('segundoApellido')?.setValue('')
-        this.form.get('primerApellido')?.setValue('')
+        this.datos = true;
+        this.form.get('nombres')?.setValue('');
+        this.form.get('segundoApellido')?.setValue('');
+        this.form.get('primerApellido')?.setValue('');
       }
-    })
+    });
 
-    this.form.controls['estadoCivil'].valueChanges.subscribe(value => {
-      this.estadoRegister = value
+    this.form.controls['estadoCivil'].valueChanges.subscribe((value) => {
+      this.estadoRegister = value;
       switch (value) {
         case '2': //casado
           this.estadoCasado = true;
-          this.estadoConviviente = false
-          this.estadoCivilAdministrado = 2
+          this.estadoConviviente = false;
+          this.estadoCivilAdministrado = 2;
           break;
         case '5': //conviviente
           this.estadoConviviente = true;
           this.estadoCasado = false;
           this.form.get('numeroPartida')?.setValidators([Validators.required]);
-          this.ref.detectChanges()
+          this.ref.detectChanges();
           break;
         default: //cualquier otro estado
           this.estadoCasado = false;
-          this.estadoConviviente = false
+          this.estadoConviviente = false;
           break;
       }
     });
-    this.cargarEstadoCivil()
-    this.cargarFactor()
+    this.cargarEstadoCivil();
+    this.cargarFactor();
   }
 
   cargarEstadoCivil() {
-    this.reniecService.getEstadoCivil().subscribe(e => {
-      if (!e) return;
-      this.estadoCivil = e
-    }, error => {
-      this.errorMessage = error;
-    })
+    this.reniecService.getEstadoCivil().subscribe(
+      (e) => {
+        if (!e) return;
+        this.estadoCivil = e;
+        const estadoInit = e.map(m=> m.secuEntiDet)
+        this.estadoSelected=estadoInit[0].toString()
+      },
+      (error) => {
+        this.errorMessage = error;
+      }
+    );
   }
 
   cargarFactor() {
-    this.reniecService.getFactor().subscribe(f => {
+    this.reniecService.getFactor().subscribe(
+      (f) => {
         if (!f) return;
-        this.factor = f
+        this.factor = f;
       },
-      error => {
+      (error) => {
         this.errorMessage = error;
-      })
+      }
+    );
   }
 
   addItemTable() {
     if (this.selectedOption && this.inputValue) {
-      const existeTipoValor = this.data.some(item => item.factorIngresoId === this.selectedOption);
-      const selectedId = this.factor.find(item => item.valoCaduDet === this.selectedOption);
+      const existeTipoValor = this.data.some(
+        (item) => item.factorIngresoId === this.selectedOption
+      );
+      const selectedId = this.factor.find(
+        (item) => item.valoCaduDet === this.selectedOption
+      );
       if (!existeTipoValor) {
         this.data.push({
           factorIngreso: selectedId!.secuEntiDet.toString(),
           monto: this.inputValue,
-          factorIngresoId: this.selectedOption
+          factorIngresoId: this.selectedOption,
         });
         this.table.renderRows();
         // Limpiar campos después de agregar
         this.selectedOption = '';
         this.inputValue = 0;
         //oculart mensajes de campos
-        this.datosNecesarios = false
-        this.mostrarMensaje = false
+        this.datosNecesarios = false;
+        this.mostrarMensaje = false;
       } else {
-        this.mostrarMensaje = true
-        this.datosNecesarios = false
+        this.mostrarMensaje = true;
+        this.datosNecesarios = false;
       }
     } else {
-      this.datosNecesarios = true
+      this.datosNecesarios = true;
     }
   }
 
@@ -212,58 +245,67 @@ export class FormularioComponent implements OnInit {
       case 'dni':
         return this.form.controls['dni'].value.length !== 8;
       case 'cip':
-        return this.form.controls['cip'].value.length !== 8
+        return this.form.controls['cip'].value.length !== 8;
       case 'telefono1':
-        return this.form.controls['telefono1'].value.length !== 9
+        return this.form.controls['telefono1'].value.length !== 9;
       case 'direccion1':
-        return this.form.controls['direccion1'].value.length !== 100
+        return this.form.controls['direccion1'].value.length !== 100;
       case 'numeroPartida':
-        return this.form.controls['numeroPartida'].value.length !== 20
+        return this.form.controls['numeroPartida'].value.length !== 20;
     }
     return null;
   }
 
   obtenerDatos() {
-    this.loading = true
-    const dni = this.form.controls['dni'].value
+    this.loading = true;
+    const dni = this.form.controls['dni'].value;
     if (dni) {
-      this.reniecService.getDatosReniec(dni)
-        .pipe().subscribe(d => {
-        if (d.codigoError === '00') {
-          this.loading = false
-          this.form.patchValue({
-            nombres: d.nombres,
-            primerApellido: d.apellidoPaterno,
-            segundoApellido: d.apellidoMaterno,
-          })
-          this.nombres = d.nombres
-          this.primerApellido = d.apellidoPaterno
-          this.segundoApellido = d.apellidoMaterno
-          this.datos = false
-        } else {
-          this.loading = false
-          this.form.get('dni')!.setValue('');
-          this.datos = true
-        }
-      }, error => {
-        this.loading = false
-        this.errorMessage = error;
-      })
+      this.reniecService
+        .getDatosReniec(dni)
+        .pipe()
+        .subscribe(
+          (d) => {
+            if (d.codigoError === '00') {
+              this.loading = false;
+              this.form.patchValue({
+                nombres: d.nombres,
+                primerApellido: d.apellidoPaterno,
+                segundoApellido: d.apellidoMaterno,
+              });
+              this.nombres = d.nombres;
+              this.primerApellido = d.apellidoPaterno;
+              this.segundoApellido = d.apellidoMaterno;
+              this.datos = false;
+            } else {
+              this.loading = false;
+              this.form.get('dni')!.setValue('');
+              this.datos = true;
+            }
+          },
+          (error) => {
+            this.loading = false;
+            this.errorMessage = error;
+          }
+        );
     } else {
-      this.loading = false
-      this.form.get('dni')?.markAsTouched()
+      this.loading = false;
+      this.form.get('dni')?.markAsTouched();
       return;
     }
   }
 
   recaptchaResolved(captchaResponse: string) {
-    this.valueCaptcha = captchaResponse
+    if (captchaResponse) {
+      this.valueCaptcha = captchaResponse;
+      this.mostarMensajeCaptcha = false
+    } else {
+      this.capthcForm.reset();
+    }
   }
 
   isValidField(field: string): boolean | null {
     return (
-      this.form.controls[field].errors &&
-      this.form.controls[field].touched
+      this.form.controls[field].errors && this.form.controls[field].touched
     );
   }
 
@@ -274,7 +316,7 @@ export class FormularioComponent implements OnInit {
   limpiarform() {
     this.form.get('dni')!.setValue('');
     window.location.reload();
-    this.cleanFormulario()
+    this.cleanFormulario();
   }
 
   agregarCeros() {
@@ -283,42 +325,53 @@ export class FormularioComponent implements OnInit {
     }
   }
 
-  registrar() {
-    this.cargarCatos()
-    // console.log('dataTotal--> ', this.dataTotal)
-    this.loading = true
-    if (this.estadoRegister === 2 && !(this.formConyugeIsValid)) {
-      this.mostarMensajeConyuge = true
-      this.loading = false;
-      return;
-    }
+  handleCheckbox(data: any) {
+    this.terminos = data;
+    this.terminosMarcar = !this.terminos;
+  }
 
-    if (this.form.invalid) {
-      this.terminosMarcar = true
-      this.loading = false
+  resert(){
+    this.capthcForm.reset()
+  }
+
+  registrar() {
+    // debugger;
+    const captchaIdValid = anyToBoolean(this.captchaResponse)
+    captchaIdValid== true ? this.mostarMensajeCaptcha = false :this.mostarMensajeCaptcha = true
+    if (this.form.invalid || !this.terminos) {
+      this.terminosMarcar = true;
+      this.loading = false;
       this.form.markAllAsTouched();
       return;
     }
-
+    if (this.estadoRegister === '2' && this.formConyugeIsValid == false) {
+      this.mostarMensajeConyuge = true;
+      this.loading = false;
+      return;
+    }
+    if (this.estadoRegister === '5' && this.formConvivienteIsValid == false) {
+      this.mostarMensajeConviviente = true;
+      this.loading = false;
+      return;
+    }
+    this.cargarCatos();
+    // this.loading = false;
+    // console.log('dataTotal--> ', this.dataTotal);
     this.reniecService.registrarInscripcion(this.dataTotal).subscribe(
       data => {
-        const valido = data.code
-        const mensaje = data.message
-        if (valido === 400) {
-          this.modalInfo(mensaje)
-          this.loading = false
-          return;
-        }
-        if (data) {
+        if (data.body) {
           const nameSucces = this.form.get('nombres')?.value
           this.loading = false
           this.modalSuccessInscription(nameSucces)
         }
-      },
-      error => {
-        this.loading = false;
-        this.msotarModalError()
-        this.errorMessage = error;
+        const inValido = data.code
+        const mensaje = data.message
+        if (inValido === 400) {
+          this.modalInfo(mensaje)
+          this.loading = false
+          this.capthcForm.reset()
+          return;
+        }
       }
     )
   }
@@ -334,19 +387,38 @@ export class FormularioComponent implements OnInit {
         ingresos: this.data,
         ip: null,
         nombres: this.form.get('nombres')?.value,
-        numeroPartida: this.form.get('numeroPartida')?.value ? this.form.get('numeroPartida')?.value : null,
+        numeroPartida: this.form.get('numeroPartida')?.value
+          ? this.form.get('numeroPartida')?.value
+          : null,
         primerApellido: this.form.get('primerApellido')?.value,
         segundoApellido: this.form.get('segundoApellido')?.value,
         telefono1: this.form.get('telefono1')?.value,
+        terminos: this.terminos,
         // form coyuge ---
-        cipConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.cipconyuge : null,
-        dniConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.dniconyuge : null,
-        ingresosConyuge: this.estadoRegister == 2 ? this.conyugeData.dataConyuge : null,
-        nombresConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.nombreconyuge : null,
-        primerApellidoConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.primerApellidoConyuge : null,
-        segundoApellidoConyuge: this.estadoRegister == 2 ? this.conyugeData.formConyuge.segundoApellidoConyuge : null,
-        captcha: this.estadoRegister == 2 ? this.valueCaptcha : null
-      }
+        cipConyuge:
+          this.estadoRegister == '2'
+            ? this.conyugeData.formConyuge.cipconyuge
+            : null,
+        dniConyuge:
+          this.estadoRegister == '2'
+            ? this.conyugeData.formConyuge.dniconyuge
+            : null,
+        ingresosConyuge:
+          this.estadoRegister == '2' ? this.conyugeData.dataConyuge : null,
+        nombresConyuge:
+          this.estadoRegister == '2'
+            ? this.conyugeData.formConyuge.nombreconyuge
+            : null,
+        primerApellidoConyuge:
+          this.estadoRegister == '2'
+            ? this.conyugeData.formConyuge.primerApellidoConyuge
+            : null,
+        segundoApellidoConyuge:
+          this.estadoRegister == '2'
+            ? this.conyugeData.formConyuge.segundoApellidoConyuge
+            : null,
+        captcha: this.estadoRegister == '2' ? this.valueCaptcha : null,
+      };
     }
     if (this.estadoRegister == this.CONVIVIENTE) {
       this.dataTotal = {
@@ -358,21 +430,42 @@ export class FormularioComponent implements OnInit {
         ingresos: this.data,
         ip: null,
         nombres: this.form.get('nombres')?.value,
-        numeroPartida: this.form.get('numeroPartida')?.value ? this.form.get('numeroPartida')?.value : null,
+        numeroPartida: this.form.get('numeroPartida')?.value
+          ? this.form.get('numeroPartida')?.value
+          : null,
         primerApellido: this.form.get('primerApellido')?.value,
         segundoApellido: this.form.get('segundoApellido')?.value,
         telefono1: this.form.get('telefono1')?.value,
+        terminos: this.terminos,
         // form conviviente ---
-        cipConyuge: this.convivienteData.formConviviente.cipConviviente ? this.convivienteData.formConviviente.cipConviviente : null,
-        dniConyuge: this.convivienteData.formConviviente.dniConviviente ? this.convivienteData.formConviviente.dniConviviente : null,
-        ingresosConyuge: this.convivienteData.dataConviviente ? this.convivienteData.dataConviviente : null,
-        nombresConyuge: this.convivienteData.formConviviente.nombreConviviente ? this.convivienteData.formConviviente.nombreConviviente : null,
-        primerApellidoConyuge: this.convivienteData.formConviviente.primerApellidoConviviente ? this.convivienteData.formConviviente.primerApellidoConviviente : null,
-        segundoApellidoConyuge: this.convivienteData.formConviviente.segundoApellidoConviviente ? this.convivienteData.formConviviente.segundoApellidoConviviente : null,
-        captcha: this.valueCaptcha ? this.valueCaptcha : null
-      }
+        cipConyuge: this.convivienteData.formConviviente.cipConviviente
+          ? this.convivienteData.formConviviente.cipConviviente
+          : null,
+        dniConyuge: this.convivienteData.formConviviente.dniConviviente
+          ? this.convivienteData.formConviviente.dniConviviente
+          : null,
+        ingresosConyuge: this.convivienteData.dataConviviente
+          ? this.convivienteData.dataConviviente
+          : null,
+        nombresConyuge: this.convivienteData.formConviviente.nombreConviviente
+          ? this.convivienteData.formConviviente.nombreConviviente
+          : null,
+        primerApellidoConyuge: this.convivienteData.formConviviente
+          .primerApellidoConviviente
+          ? this.convivienteData.formConviviente.primerApellidoConviviente
+          : null,
+        segundoApellidoConyuge: this.convivienteData.formConviviente
+          .segundoApellidoConviviente
+          ? this.convivienteData.formConviviente.segundoApellidoConviviente
+          : null,
+        captcha: this.valueCaptcha ? this.valueCaptcha : null,
+      };
     }
-    if (this.estadoRegister == 1 || this.estadoRegister == 3 || this.estadoRegister == 4) {
+    if (
+      this.estadoRegister == '1' ||
+      this.estadoRegister == '3' ||
+      this.estadoRegister == '4'
+    ) {
       this.dataTotal = {
         cip: this.form.get('cip')?.value,
         direccion1: this.form.get('direccion1')?.value,
@@ -382,10 +475,13 @@ export class FormularioComponent implements OnInit {
         ingresos: this.data,
         ip: null,
         nombres: this.form.get('nombres')?.value,
-        numeroPartida: this.form.get('numeroPartida')?.value ? this.form.get('numeroPartida')?.value : null,
+        numeroPartida: this.form.get('numeroPartida')?.value
+          ? this.form.get('numeroPartida')?.value
+          : null,
         primerApellido: this.form.get('primerApellido')?.value,
         segundoApellido: this.form.get('segundoApellido')?.value,
         telefono1: this.form.get('telefono1')?.value,
+        terminos: this.terminos,
         // form coyuge ---
         cipConyuge: null,
         dniConyuge: null,
@@ -393,33 +489,37 @@ export class FormularioComponent implements OnInit {
         nombresConyuge: null,
         primerApellidoConyuge: null,
         segundoApellidoConyuge: null,
-        captcha: this.valueCaptcha ? this.valueCaptcha : null
-      }
+        captcha: this.valueCaptcha ? this.valueCaptcha : null,
+      };
     }
   }
 
-
   modalInfo(mensaje: string) {
-    this.dialogRef = this.dialog.open(ModalInvalidFormCoyugeComponent, {
+    (this.dialogRef = this.dialog.open(ModalInvalidFormCoyugeComponent, {
       width: '450px',
       panelClass: 'modal-Info',
       data: {
         title: 'Info',
-        data: mensaje
-      }
-    })
+        message: mensaje,
+      },
+    })),
+      this.dialogRef.afterClosed().subscribe(() => {
+        // this.cleanFormulario();
+        // this.form.get('dni')!.setValue('');
+        window.location.reload();
+      });
   }
 
   modalSuccessInscription(data: string) {
-    this.loading = false
+    this.loading = false;
     this.dialogRef = this.dialog.open(ModalSuccesInscriptionComponent, {
       width: '450px',
       panelClass: 'modal-succes',
       data: {
         title: 'Exitoso',
-        nombres: data
-      }
-    })
+        nombres: data,
+      },
+    });
     this.dialogRef.afterClosed().subscribe(() => {
       this.cleanFormulario();
       this.form.get('dni')!.setValue('');
@@ -432,9 +532,9 @@ export class FormularioComponent implements OnInit {
       width: '450px',
       panelClass: 'modal-succes',
       data: {
-        title: 'Error'
-      }
-    })
+        title: 'Error',
+      },
+    });
     this.dialogRef.afterClosed().subscribe(() => {
       this.cleanFormulario();
       this.form.get('dni')!.setValue('');
@@ -443,11 +543,10 @@ export class FormularioComponent implements OnInit {
   }
 
   cleanFormulario() {
-    this.form.reset()
-    this.datos = true
-    this.nombres = ''
-    this.primerApellido = ''
-    this.segundoApellido = ''
+    this.form.reset();
+    this.datos = true;
+    this.nombres = '';
+    this.primerApellido = '';
+    this.segundoApellido = '';
   }
-
 }

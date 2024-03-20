@@ -84,7 +84,6 @@ export class FormConvivienteComponent implements OnInit, OnChanges {
   }
 
   emitirValores() {
-    debugger
     const {
       nombreConviviente,
       primerApellidoConviviente,

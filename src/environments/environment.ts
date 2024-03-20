@@ -1,9 +1,10 @@
-const protocol = 'http'
-const host = '192.168.33.21'
+const protocol = 'https'
+const host = 'app.fovipol.gob.pe'
+const subdomin = 'foviadmin-informacion'
 const port = '8181'
-const port_dos = '9090';
-const api_public = `${protocol}://${host}:${port}`
-const api_public_90 = `${protocol}://${host}:${port_dos}`
+
+// constante public
+const api_public = `${protocol}://${host}:${port}/${subdomin}`
 
 
 export const environment = {
@@ -12,7 +13,7 @@ export const environment = {
   api: {
     route: {
       consultarDni: `${api_public}/reniec/personaByDni`,
-      consutlaEstado: `${api_public_90}/entidaddetalle`,
+      consutlaEstado: `${api_public}/entidaddetalle`,
       registrarInscripcion: `${api_public}/inscripcion`
     }
   },
