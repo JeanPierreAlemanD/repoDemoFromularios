@@ -5,7 +5,7 @@ import {HeaderComponent} from './shared/layoud/header/header.component';
 import {FooterComponent} from './shared/layoud/footer/footer.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from "./shared/material/material.module";
-import {RECAPTCHA_SETTINGS, RecaptchaFormsModule, RecaptchaModule} from "ng-recaptcha";
+import {RECAPTCHA_SETTINGS, RecaptchaFormsModule, RecaptchaModule, RecaptchaSettings} from "ng-recaptcha";
 import {environment} from "../environments/environment";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {FormularioComponent} from './components/formulario/formulario.component';
@@ -36,7 +36,6 @@ import { FormConvivienteComponent } from './components/form-conviviente/form-con
     MaterialModule,
     ReactiveFormsModule,
     FormsModule,
-    RecaptchaModule,
     HttpClientModule,
     OnlyNumberDirective,
     OnlyLettersDirective,
@@ -50,7 +49,7 @@ import { FormConvivienteComponent } from './components/form-conviviente/form-con
   providers: [
     {
       provide: RECAPTCHA_SETTINGS,
-      useValue: {siteKey: environment.key.recaptcha}
+      useValue: {siteKey: environment.key.recaptcha} as RecaptchaSettings
     },
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

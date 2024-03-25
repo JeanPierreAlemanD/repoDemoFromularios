@@ -1,11 +1,10 @@
 const protocol = 'https'
-const host = 'app.fovipol.gob.pe'
+const host = 'appdesa.fovipol.gob.pe'
 const subdomin = 'foviadmin-informacion'
 const port = '8181'
 
 // constante public
 const api_public = `${protocol}://${host}:${port}/${subdomin}`
-
 
 export const environment = {
   production: false,
@@ -18,6 +17,6 @@ export const environment = {
     }
   },
   key: {
-    recaptcha: '6LcKzJcpAAAAAEgcEJ3zYFHIiq7LHprghEp6Mf1f'
+    recaptcha: '6LdhTqQpAAAAAFcrzXfZ8c_3NwNP-B2GKKRniVrD'
   }
 };
